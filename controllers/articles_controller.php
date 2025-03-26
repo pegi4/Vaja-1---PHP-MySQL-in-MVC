@@ -37,7 +37,29 @@ class articles_controller
         require_once('views/articles/show.php');
     }
 
-    public function create(){
+    public function create()
+    {
+        if (!isset($_SESSION['USER_ID'])) {
+            header("Location: /auth/login");
+            exit();
+        }
         require_once('views/articles/create.php');
+    }
+
+    public function store()
+    {
+        if (!isset($_SESSION['USER_ID'])) {
+            header("Location: /auth/login");
+            exit();
+        }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $title = $_POST['title'];
+            $abstract = $_POST['abstract'];
+            $text = $_POST['text'];
+            $user_id = $_SESSION['USER_ID'];
+            Article::insert($title, $abstract, $text, $user_id);
+            header("Location: /");
+            exit();
+        }
     }
 }
