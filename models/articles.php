@@ -94,4 +94,15 @@ class Article
         $query = "UPDATE articles SET title = '$title', abstract = '$abstract', text = '$text' WHERE id = '$id'";
         $db->query($query);
     }
+
+
+    // Nova metoda za brisanje novice
+    public static function delete($id)
+    {
+        $db = Db::getInstance();
+        $id = mysqli_real_escape_string($db, $id);
+        $query = "DELETE FROM articles WHERE id = '$id'";
+        $db->query($query);
+        return $db->affected_rows > 0; // Vrne true, če je bila novica izbrisana
+    }
 }
