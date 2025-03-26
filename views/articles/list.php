@@ -16,6 +16,8 @@ if (!isset($_SESSION['USER_ID'])) {
                     <h5><?php echo htmlspecialchars($article->title); ?></h5>
                     <p><?php echo htmlspecialchars($article->abstract); ?></p>
                     <small>Objavljeno: <?php echo $article->date; ?></small>
+                    <br>
+                    <a href="/articles/edit/<?php echo $article->id; ?>" class="btn btn-primary btn-sm mt-2">Uredi</a>
                 </li>
             <?php endforeach; ?>
         </ul>

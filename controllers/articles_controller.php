@@ -5,10 +5,6 @@
         show: izpiše posamezno novico
         
     TODO:
-        list: izpiše novice prijavljenega uporabnika
-        create: izpiše obrazec za vstavljanje novice
-        edit: izpiše vmesnik za urejanje novice
-        update: posodobi novico v bazi
         delete: izbriše novico iz baze
 */
 
@@ -62,7 +58,7 @@ class articles_controller
         }
     }
 
-    // Nova akcija za "Moje novice"
+    // Akcija za "Moje novice"
     public function list()
     {
         if (!isset($_SESSION['USER_ID'])) {
@@ -71,5 +67,43 @@ class articles_controller
         }
         $articles = Article::findByUserId($_SESSION['USER_ID']);
         require_once('views/articles/list.php');
+    }
+
+    // Akcija za prikaz obrazca za urejanje
+    public function edit()
+    {
+        if (!isset($_SESSION['USER_ID'])) {
+            header("Location: /auth/login");
+            exit();
+        }
+        if (!isset($_GET['id'])) {
+            return call('pages', 'error');
+        }
+        $article = Article::find($_GET['id']);
+        if (!$article || $article->user->id != $_SESSION['USER_ID']) {
+            return call('pages', 'error'); // Prepreči urejanje tujih novic
+        }
+        require_once('views/articles/edit.php');
+    }
+
+    // Akcija za shranjevanje sprememb
+    public function update()
+    {
+        if (!isset($_SESSION['USER_ID'])) {
+            header("Location: /auth/login");
+            exit();
+        }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id'])) {
+            $article = Article::find($_POST['id']);
+            if (!$article || $article->user->id != $_SESSION['USER_ID']) {
+                return call('pages', 'error');
+            }
+            $title = $_POST['title'];
+            $abstract = $_POST['abstract'];
+            $text = $_POST['text'];
+            Article::update($_POST['id'], $title, $abstract, $text);
+            header("Location: /articles/list");
+            exit();
+        }
     }
 }
