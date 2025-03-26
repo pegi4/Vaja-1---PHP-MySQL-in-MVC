@@ -106,4 +106,22 @@ class articles_controller
             exit();
         }
     }
+
+    public function delete()
+    {
+        if (!isset($_SESSION['USER_ID'])) {
+            header("Location: /auth/login");
+            exit();
+        }
+        if (!isset($_GET['id'])) {
+            return call('pages', 'error');
+        }
+        $article = Article::find($_GET['id']);
+        if (!$article || $article->user->id != $_SESSION['USER_ID']) {
+            return call('pages', 'error'); // Prepreči brisanje tujih novic
+        }
+        Article::delete($_GET['id']);
+        header("Location: /articles/list");
+        exit();
+    }
 }
