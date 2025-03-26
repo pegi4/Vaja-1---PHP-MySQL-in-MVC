@@ -7,7 +7,6 @@
     TODO:
         list: izpiše novice prijavljenega uporabnika
         create: izpiše obrazec za vstavljanje novice
-        store: vstavi novico v bazo
         edit: izpiše vmesnik za urejanje novice
         update: posodobi novico v bazi
         delete: izbriše novico iz baze
@@ -61,5 +60,16 @@ class articles_controller
             header("Location: /");
             exit();
         }
+    }
+
+    // Nova akcija za "Moje novice"
+    public function list()
+    {
+        if (!isset($_SESSION['USER_ID'])) {
+            header("Location: /auth/login");
+            exit();
+        }
+        $articles = Article::findByUserId($_SESSION['USER_ID']);
+        require_once('views/articles/list.php');
     }
 }
