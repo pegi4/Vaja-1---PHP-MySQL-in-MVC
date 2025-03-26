@@ -1,0 +1,1 @@
+Naloga PHP, MYSQL in MVC arhitektura

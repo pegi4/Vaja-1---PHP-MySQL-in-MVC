@@ -1,0 +1,68 @@
+services:
+  # MySQL Database
+  db:
+    image: mysql:8.0
+    container_name: mysql_db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mydb
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - ./mysql_data:/var/lib/mysql
+    networks:
+      - web_network
+
+  # phpMyAdmin with auto-login
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    depends_on:
+      - db
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      PMA_ARBITRARY: 1
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+      MYSQL_USERNAME: root
+      MYSQL_PASSWORD: rootpassword
+      PMA_ABSOLUTE_URI: http://localhost:8080/
+    ports:
+      - "8080:80"
+    networks:
+      - web_network
+
+  # Nginx server
+  nginx:
+    image: nginx:alpine
+    container_name: nginx_dev
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
+      - ${PROJECT_PATH:-./app}:/var/www/html
+    networks:
+      - web_network
+
+  # PHP-FPM Service
+  php:
+    image: php:8.2-fpm
+    container_name: php_fpm
+    volumes:
+      - ${PROJECT_PATH:-./app}:/var/www/html
+    command: >
+      bash -c "docker-php-ext-install mysqli pdo pdo_mysql &&
+               docker-php-ext-enable mysqli &&
+               php-fpm"
+    networks:
+      - web_network
+
+networks:
+  web_network:
+    driver: bridge
